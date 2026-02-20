@@ -58,8 +58,12 @@ class Result<T> {
     return this;
   }
 
-  // Executa uma função se o resultado for sucesso.
-  // Retorna o mesmo Result se for falha.
+  /// Equivalente ao fold do dartz: (onFailure, onSuccess)
+  E fold<E>(E Function(String error) onFailure, E Function(T data) onSuccess) {
+    if (_isSuccess) return onSuccess(_data as T);
+    return onFailure(_error!);
+  }
+
   Result<T> onSuccess(void Function(T data) callback) {
     if (_isSuccess) {
       callback(_data as T);
@@ -67,8 +71,6 @@ class Result<T> {
     return this;
   }
 
-  // Executa uma função se o resultado for falha.
-  // Retorna o mesmo Result se for sucesso.
   Result<T> onFailure(void Function(String error) callback) {
     if (!_isSuccess) {
       callback(_error!);
