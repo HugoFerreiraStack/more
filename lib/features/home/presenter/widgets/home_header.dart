@@ -1,4 +1,4 @@
-import 'package:b3/config/responsive/app_responsive.dart';
+import 'package:b3/config/accessibility/app_semantics.dart';
 import 'package:b3/config/themes/app_assets.dart';
 import 'package:b3/config/themes/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +7,14 @@ import 'package:google_fonts/google_fonts.dart';
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
+  static const _expandedHeight = 120.0;
+  static const _compactHeight = 72.0;
+
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-      expandedHeight: 120,
+      expandedHeight: _expandedHeight,
+      toolbarHeight: _compactHeight,
       floating: false,
       pinned: true,
       stretch: true,
@@ -18,10 +22,10 @@ class HomeHeader extends StatelessWidget {
       elevation: 0,
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
-          final isCompact = AppResponsive.isHeaderCompactFromConstraints(
-            constraints,
-            context,
-          );
+          final rawT = ((constraints.maxHeight - _compactHeight) /
+                  (_expandedHeight - _compactHeight))
+              .clamp(0.0, 1.0);
+          final t = Curves.easeInOutCubic.transform(rawT);
           return Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -39,78 +43,92 @@ class HomeHeader extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
                   24,
-                  isCompact ? 12 : 16,
+                  _lerp(12, 16, t),
                   24,
-                  isCompact ? 10 : 20,
+                  _lerp(10, 20, t),
                 ),
                 child: Semantics(
                   container: true,
-                  label: 'A Bolsa do Brasil. Cotações em tempo real.',
+                  label: AppSemantics.header,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(isCompact ? 4 : 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(isCompact ? 10 : 12),
-                          ),
-                          child: ColorFiltered(
-                            colorFilter: const ColorFilter.mode(
-                              Colors.white,
-                              BlendMode.srcIn,
-                            ),
-                            child: ExcludeSemantics(
-                              child: Image.asset(
-                                AppAssets.logo,
-                                height: isCompact ? 20 : 28,
-                                width: isCompact ? 20 : 28,
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'A Bolsa do Brasil',
-                                style: GoogleFonts.inter(
-                                  fontSize: isCompact ? 15 : 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                  letterSpacing: -0.5,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              if (!isCompact) ...[
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Cotações em tempo real',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontWeight: FontWeight.w400,
+                              Container(
+                                padding: EdgeInsets.all(_lerp(4, 8, t)),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(
+                                    _lerp(10, 12, t),
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ],
-                            ],
-                          ),
+                                child: ColorFiltered(
+                                  colorFilter: const ColorFilter.mode(
+                                    Colors.white,
+                                    BlendMode.srcIn,
+                                  ),
+                                  child: ExcludeSemantics(
+                                    child: Image.asset(
+                                      AppAssets.logo,
+                                      height: _lerp(20, 28, t),
+                                      width: _lerp(20, 28, t),
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'A Bolsa do Brasil',
+                                    style: GoogleFonts.inter(
+                                      fontSize: _lerp(15, 20, t),
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Opacity(
+                                    opacity: t,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(height: _lerp(0, 2, t)),
+                                        Text(
+                                          'Cotações em tempo real',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 14,
+                                            color: Colors.white.withValues(alpha: 0.9),
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ],
-                ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -119,4 +137,6 @@ class HomeHeader extends StatelessWidget {
       ),
     );
   }
+
+  static double _lerp(double a, double b, double t) => a + (b - a) * t;
 }

@@ -1,3 +1,4 @@
+import 'package:b3/config/accessibility/app_semantics.dart';
 import 'package:b3/config/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -57,7 +58,7 @@ class StockSearchBar extends StatelessWidget {
             builder: (_, value, __) {
               if (value.text.isEmpty) return const SizedBox.shrink();
               return Semantics(
-                label: 'Limpar busca',
+                label: AppSemantics.searchClear,
                 button: true,
                 child: IconButton(
                   icon: Icon(

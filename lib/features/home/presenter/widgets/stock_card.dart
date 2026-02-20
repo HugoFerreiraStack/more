@@ -1,7 +1,11 @@
+import 'package:b3/config/accessibility/app_semantics.dart';
 import 'package:b3/config/themes/app_colors.dart';
+import 'package:b3/config/routes/app_pages.dart';
 import 'package:b3/features/home/domain/models/stock.dart';
+import 'package:b3/features/home/presenter/utils/stock_display_helper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StockCard extends StatelessWidget {
@@ -11,18 +15,15 @@ class StockCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final changeColor = stock.isPositive ? AppColors.success : AppColors.error;
-    final changePrefix = stock.isPositive ? '+' : '';
-
-    final changeText =
-        '$changePrefix${stock.change.toStringAsFixed(2)}%';
-    final priceText = 'R\$ ${stock.close.toStringAsFixed(2)}';
-
     return Semantics(
       container: true,
-      label: '${stock.stock} ${stock.name}. '
-          'Preço $priceText. '
-          'Variação $changeText.',
+      button: true,
+      label: AppSemantics.stockCard(
+        stock.stock,
+        stock.name,
+        StockDisplayHelper.priceText(stock),
+        StockDisplayHelper.changeText(stock),
+      ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
@@ -44,7 +45,7 @@ class StockCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () => Get.toNamed(AppRoutes.stockDetail, arguments: stock),
           borderRadius: BorderRadius.circular(20),
           child: Padding(
             padding: const EdgeInsets.all(18),
@@ -53,7 +54,7 @@ class StockCard extends StatelessWidget {
                 _buildLogo(),
                 const SizedBox(width: 16),
                 Expanded(child: _buildInfo()),
-                _buildPrice(changeColor, changePrefix),
+                _buildPrice(),
               ],
             ),
           ),
@@ -140,13 +141,14 @@ class StockCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPrice(Color changeColor, String changePrefix) {
+  Widget _buildPrice() {
+    final color = StockDisplayHelper.changeColor(stock);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'R\$ ${stock.close.toStringAsFixed(2)}',
+          StockDisplayHelper.priceText(stock),
           style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -158,15 +160,15 @@ class StockCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: changeColor.withValues(alpha: 0.12),
+            color: color.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            '$changePrefix${stock.change.toStringAsFixed(2)}%',
+            StockDisplayHelper.changeText(stock),
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: changeColor,
+              color: color,
             ),
           ),
         ),

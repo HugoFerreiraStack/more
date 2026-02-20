@@ -1,3 +1,4 @@
+import 'package:b3/config/accessibility/app_semantics.dart';
 import 'package:b3/config/themes/app_colors.dart';
 import 'package:b3/features/home/presenter/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class StockSortButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Ordenar lista por',
+      label: AppSemantics.sortGroup,
       child: LayoutBuilder(
         builder: (_, constraints) {
           return SingleChildScrollView(
@@ -78,16 +79,14 @@ class _SortChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String semanticsLabel;
-    if (isSelected && sortDescending != null) {
-      final dir = label == 'Nome'
-          ? (sortDescending! ? 'Z a A' : 'A a Z')
-          : (sortDescending! ? 'maior primeiro' : 'menor primeiro');
-      semanticsLabel =
-          'Ordenar por $label, $dir. Toque para inverter ou remover ordenação.';
-    } else {
-      semanticsLabel = 'Ordenar por $label';
-    }
+    final semanticsLabel = isSelected && sortDescending != null
+        ? AppSemantics.sortChip(
+            label,
+            label == 'Nome'
+                ? AppSemantics.sortDirectionAlphabetical(sortDescending!)
+                : AppSemantics.sortDirectionName(sortDescending!),
+          )
+        : AppSemantics.sortChip(label);
 
     return Semantics(
       label: semanticsLabel,

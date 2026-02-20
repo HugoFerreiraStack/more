@@ -1,3 +1,4 @@
+import 'package:b3/config/accessibility/app_semantics.dart';
 import 'package:b3/config/themes/app_colors.dart';
 import 'package:b3/features/home/presenter/controllers/home_controller.dart';
 import 'package:b3/features/home/presenter/widgets/widgets.dart';
@@ -67,7 +68,7 @@ class HomePage extends GetView<HomeController> {
                   if (isSearching && filtered.isEmpty) {
                     return SliverToBoxAdapter(
                       child: Semantics(
-                        label: 'Nenhum ativo encontrado. Tente outro termo, por exemplo PETR4 ou Vale.',
+                        label: AppSemantics.emptySearch,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 48),
                           child: Center(
@@ -142,7 +143,7 @@ class HomePage extends GetView<HomeController> {
                 () => controller.errorMessage.value.isNotEmpty
                     ? SliverToBoxAdapter(
                         child: Semantics(
-                        label: 'Erro ao carregar. ${controller.errorMessage.value}',
+                        label: AppSemantics.errorState(controller.errorMessage.value),
                         child: Padding(
                           padding: const EdgeInsets.all(32),
                           child: Column(
@@ -174,7 +175,7 @@ class HomePage extends GetView<HomeController> {
                               ),
                               const SizedBox(height: 20),
                               Semantics(
-                                label: 'Tentar novamente. Recarregar cotações.',
+                                label: AppSemantics.retryButton,
                                 button: true,
                                 child: FilledButton.icon(
                                   onPressed: () => controller.fetchStocks(),
@@ -206,7 +207,7 @@ class HomePage extends GetView<HomeController> {
           Obx(
             () => controller.isLoading.value
                 ? Semantics(
-                    label: 'Carregando cotações. Por favor aguarde.',
+                    label: AppSemantics.loading,
                     child: Container(
                     color: AppColors.surface.withValues(alpha: 0.95),
                     child: Center(
