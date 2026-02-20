@@ -15,9 +15,14 @@ class HomePage extends GetView<HomeController> {
       backgroundColor: AppColors.surface,
       body: Stack(
         children: [
-          CustomScrollView(
-            controller: controller.scrollController,
-            physics: const BouncingScrollPhysics(),
+          RefreshIndicator(
+            onRefresh: controller.refreshStocks,
+            color: AppColors.accent,
+            child: CustomScrollView(
+              controller: controller.scrollController,
+              physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             slivers: [
               const HomeHeader(),
               SliverToBoxAdapter(
@@ -203,6 +208,7 @@ class HomePage extends GetView<HomeController> {
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 40)),
             ],
+            ),
           ),
           Obx(
             () => controller.isLoading.value

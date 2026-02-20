@@ -136,6 +136,25 @@ class HomeController extends GetxController {
     return completerStocks.future;
   }
 
+  Future<void> refreshStocks() async {
+    errorMessage.value = '';
+    currentPage.value = 1;
+
+    final result = await fetchStocksUsecase.call(
+      GetQuoteListParams(page: 1, limit: 20),
+    );
+
+    result.fold(
+      (error) => errorMessage.value = error,
+      (response) {
+        stocks.value = response.stocks;
+        currentPage.value = response.currentPage;
+        totalPages.value = response.totalPages;
+        hasNextPage.value = response.hasNextPage;
+      },
+    );
+  }
+
   Future<void> loadMoreStocks() async {
     if (!hasNextPage.value || isLoadingMore.value) return;
 

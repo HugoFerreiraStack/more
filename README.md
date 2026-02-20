@@ -103,6 +103,7 @@ lib/
 ### Home (lista de ações)
 
 - Lista paginada de ativos.
+- Pull-to-refresh pra atualizar as cotações (arraste pra baixo).
 - Busca por ticker ou nome.
 - Ordenação por Nome, Preço ou Variação (ascendente, descendente ou sem ordenação).
 - Scroll infinito pra carregar mais.
