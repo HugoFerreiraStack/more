@@ -1,6 +1,4 @@
-// Result pattern para padronizar retornos de operações assíncronas.
-// Representa o resultado de uma operação que pode ter sucesso ou falhar.
-// Evita o uso de exceções para controle de fluxo e torna o tratamento de erros mais explícito.
+// Wrapper pra sucesso/erro sem depender de try-catch
 class Result<T> {
   const Result._(this._data, this._error, this._isSuccess);
 
@@ -8,21 +6,11 @@ class Result<T> {
   final String? _error;
   final bool _isSuccess;
 
-  // Cria um Result de sucesso com os dados fornecidos.
   factory Result.success(T data) => Result._(data, null, true);
-
-  // Cria um Result de falha com a mensagem de erro fornecida.
   factory Result.failure(String error) => Result._(null, error, false);
 
-  // Verifica se o resultado é um sucesso.
   bool get isSuccess => _isSuccess;
-
-  // Verifica se o resultado é uma falha.
   bool get isFailure => !_isSuccess;
-
-  // Retorna os dados em caso de sucesso.
-  
-  // Lança uma exceção se chamado em um Result de falha.
   T get data {
     if (!_isSuccess) {
       throw StateError('Cannot get data from a failed Result');
@@ -30,9 +18,6 @@ class Result<T> {
     return _data as T;
   }
 
-  // Retorna a mensagem de erro em caso de falha.
-  
-  // Lança uma exceção se chamado em um Result de sucesso.
   String get error {
     if (_isSuccess) {
       throw StateError('Cannot get error from a successful Result');
@@ -40,8 +25,6 @@ class Result<T> {
     return _error!;
   }
 
-  // Executa uma função se o resultado for sucesso. 
-  // Retorna um novo Result com o resultado da função.
   Result<R> map<R>(R Function(T data) mapper) {
     if (_isSuccess) {
       return Result.success(mapper(_data as T));
@@ -49,8 +32,6 @@ class Result<T> {
     return Result.failure(_error!);
   }
 
-  // Executa uma função se o resultado for falha.
-  // Retorna o mesmo Result se for sucesso.
   Result<T> mapError(String Function(String error) mapper) {
     if (!_isSuccess) {
       return Result.failure(mapper(_error!));
@@ -58,7 +39,6 @@ class Result<T> {
     return this;
   }
 
-  /// Equivalente ao fold do dartz: (onFailure, onSuccess)
   E fold<E>(E Function(String error) onFailure, E Function(T data) onSuccess) {
     if (_isSuccess) return onSuccess(_data as T);
     return onFailure(_error!);

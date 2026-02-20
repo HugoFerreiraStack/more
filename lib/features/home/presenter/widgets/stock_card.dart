@@ -2,6 +2,7 @@ import 'package:b3/config/themes/app_colors.dart';
 import 'package:b3/features/home/domain/models/stock.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class StockCard extends StatelessWidget {
   final Stock stock;
@@ -13,16 +14,29 @@ class StockCard extends StatelessWidget {
     final changeColor = stock.isPositive ? AppColors.success : AppColors.error;
     final changePrefix = stock.isPositive ? '+' : '';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
+    final changeText =
+        '$changePrefix${stock.change.toStringAsFixed(2)}%';
+    final priceText = 'R\$ ${stock.close.toStringAsFixed(2)}';
+
+    return Semantics(
+      container: true,
+      label: '${stock.stock} ${stock.name}. '
+          'Preço $priceText. '
+          'Variação $changeText.',
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        decoration: BoxDecoration(
         color: AppColors.card,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border, width: 1),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.04),
-            blurRadius: 8,
+            color: AppColors.primary.withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -31,19 +45,13 @@ class StockCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {},
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: const Border(
-                left: BorderSide(color: AppColors.primary, width: 4),
-              ),
-            ),
-            padding: const EdgeInsets.all(16),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
             child: Row(
               children: [
                 _buildLogo(),
-                const SizedBox(width: 14),
+                const SizedBox(width: 16),
                 Expanded(child: _buildInfo()),
                 _buildPrice(changeColor, changePrefix),
               ],
@@ -51,126 +59,115 @@ class StockCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 
   Widget _buildLogo() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: CachedNetworkImage(
-        imageUrl: stock.logo,
-        width: 44,
-        height: 44,
-        fit: BoxFit.contain,
-        placeholder: (_, __) => _buildLogoPlaceholder(),
-        errorWidget: (_, __, ___) => _buildLogoError(),
+    return ExcludeSemantics(
+      child: Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        color: AppColors.accentSoft,
+        borderRadius: BorderRadius.circular(14),
       ),
-    );
-  }
-
-  Widget _buildLogoPlaceholder() {
-    return Container(
-      width: 44,
-      height: 44,
-      color: AppColors.accent,
-      child: const Center(
-        child: SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
+          child: CachedNetworkImage(
+            imageUrl: stock.logo,
+            fit: BoxFit.contain,
+            placeholder: (_, __) => const Center(
+            child: SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          errorWidget: (_, __, ___) => Icon(
+            Icons.candlestick_chart_rounded,
+            color: AppColors.accent.withValues(alpha: 0.6),
+            size: 24,
+          ),
+          ),
         ),
       ),
-    );
-  }
-
-  Widget _buildLogoError() {
-    return Container(
-      width: 44,
-      height: 44,
-      color: AppColors.accent,
-      child: Icon(
-        Icons.show_chart_rounded,
-        color: AppColors.primary.withOpacity(0.5),
-      ),
+    ),
     );
   }
 
   Widget _buildInfo() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            Text(
-              stock.stock,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            if (stock.sector != null) ...[
-              const SizedBox(width: 6),
-              Flexible(
-                child: _buildSectorBadge(stock.sector!),
-              ),
-            ],
-          ],
+        Text(
+          stock.stock,
+          style: GoogleFonts.inter(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.3,
+          ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 4),
         Text(
           stock.name,
-          style: const TextStyle(
+          style: GoogleFonts.inter(
             fontSize: 13,
             color: AppColors.textSecondary,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
+        if (stock.sector != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            stock.sector!,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ],
-    );
-  }
-
-  Widget _buildSectorBadge(String sector) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: AppColors.accent,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        sector,
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: AppColors.primary,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
     );
   }
 
   Widget _buildPrice(Color changeColor, String changePrefix) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           'R\$ ${stock.close.toStringAsFixed(2)}',
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
+            letterSpacing: -0.2,
           ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          '$changePrefix${stock.change.toStringAsFixed(2)}%',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: changeColor,
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: changeColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            '$changePrefix${stock.change.toStringAsFixed(2)}%',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: changeColor,
+            ),
           ),
         ),
       ],

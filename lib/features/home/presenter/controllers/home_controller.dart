@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import '../../domain/models/stock.dart';
 import '../../domain/usecases/fetch_stocks_usecase.dart';
 
+enum StockSort { name, price, change }
+
 class HomeController extends GetxController {
   static HomeController get to => Get.find();
 
@@ -14,8 +16,12 @@ class HomeController extends GetxController {
   HomeController({required this.fetchStocksUsecase});
 
   final scrollController = ScrollController();
+  final searchController = TextEditingController();
 
   final RxList<Stock> stocks = <Stock>[].obs;
+  final RxString searchQuery = ''.obs;
+  final Rxn<StockSort> sortBy = Rxn<StockSort>();
+  final RxBool sortDescending = false.obs;
   final RxBool isLoading = true.obs;
   final RxBool isLoadingMore = false.obs;
   final RxString errorMessage = ''.obs;
@@ -25,6 +31,53 @@ class HomeController extends GetxController {
   final hasNextPage = false.obs;
 
   static const _loadMoreThreshold = 200.0;
+
+  List<Stock> get filteredStocks {
+    final query = searchQuery.value.trim().toLowerCase();
+    var list = query.isEmpty
+        ? stocks.toList()
+        : stocks.where((s) {
+            return s.stock.toLowerCase().contains(query) ||
+                s.name.toLowerCase().contains(query);
+          }).toList();
+    final sort = sortBy.value;
+    if (sort != null) {
+      list = _sorted(list, sort, sortDescending.value);
+    }
+    return list;
+  }
+
+  List<Stock> _sorted(List<Stock> list, StockSort sort, bool descending) {
+    final copy = List<Stock>.from(list);
+    final mult = descending ? -1 : 1;
+    switch (sort) {
+      case StockSort.name:
+        copy.sort((a, b) => mult * a.name.compareTo(b.name));
+        break;
+      case StockSort.price:
+        copy.sort((a, b) => mult * a.close.compareTo(b.close));
+        break;
+      case StockSort.change:
+        copy.sort((a, b) => mult * a.change.compareTo(b.change));
+        break;
+    }
+    return copy;
+  }
+
+  void onSearchChanged(String value) => searchQuery.value = value;
+
+  void setSort(StockSort sort) {
+    if (sortBy.value == sort) {
+      if (sortDescending.value) {
+        sortBy.value = null;
+      } else {
+        sortDescending.value = true;
+      }
+    } else {
+      sortBy.value = sort;
+      sortDescending.value = false;
+    }
+  }
 
   @override
   void onInit() {
@@ -36,6 +89,7 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     scrollController.dispose();
+    searchController.dispose();
     super.onClose();
   }
 
