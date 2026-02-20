@@ -1,6 +1,6 @@
 import 'package:b3/config/themes/app_colors.dart';
 import 'package:b3/features/home/domain/models/stock.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:b3/features/home/presenter/widgets/add_to_wallet_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -32,6 +32,20 @@ class StockDetailHeader extends StatelessWidget {
         ),
         onPressed: () => Get.back(),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Center(
+            child: AddToWalletButton(
+              stock: stock,
+              size: 40,
+              iconSize: 22,
+              foreground: Colors.white,
+              backgroundOpacity: 0.15,
+            ),
+          ),
+        ),
+      ],
       flexibleSpace: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -111,36 +125,10 @@ class StockDetailHeader extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: ColorFiltered(
-            colorFilter: const ColorFilter.mode(
-              Colors.white,
-              BlendMode.srcIn,
-            ),
-            child: CachedNetworkImage(
-              imageUrl: stock.logo,
-              fit: BoxFit.contain,
-              placeholder: (_, __) => const Center(
-                child: SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              errorWidget: (_, __, ___) => Icon(
-                Icons.candlestick_chart_rounded,
-                color: Colors.white.withValues(alpha: 0.9),
-                size: 28,
-              ),
-            ),
-          ),
-        ),
+      child: Icon(
+        Icons.candlestick_chart_rounded,
+        color: Colors.white.withValues(alpha: 0.9),
+        size: 28,
       ),
     );
   }

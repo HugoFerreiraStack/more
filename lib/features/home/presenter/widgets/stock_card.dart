@@ -2,16 +2,21 @@ import 'package:b3/config/accessibility/app_semantics.dart';
 import 'package:b3/config/themes/app_colors.dart';
 import 'package:b3/config/routes/app_pages.dart';
 import 'package:b3/features/home/domain/models/stock.dart';
+import 'package:b3/features/home/presenter/widgets/add_to_wallet_button.dart';
 import 'package:b3/features/home/presenter/utils/stock_display_helper.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StockCard extends StatelessWidget {
   final Stock stock;
+  final bool showWalletButton;
 
-  const StockCard({super.key, required this.stock});
+  const StockCard({
+    super.key,
+    required this.stock,
+    this.showWalletButton = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +60,16 @@ class StockCard extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(child: _buildInfo()),
                 _buildPrice(),
+                if (showWalletButton) ...[
+                  const SizedBox(width: 12),
+                  AddToWalletButton(
+                    stock: stock,
+                    size: 44,
+                    iconSize: 22,
+                    foreground: AppColors.textPrimary,
+                    backgroundOpacity: 0.08,
+                  ),
+                ],
               ],
             ),
           ),
@@ -73,26 +88,11 @@ class StockCard extends StatelessWidget {
         color: AppColors.accentSoft,
         borderRadius: BorderRadius.circular(14),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.all(6),
-          child: CachedNetworkImage(
-            imageUrl: stock.logo,
-            fit: BoxFit.contain,
-            placeholder: (_, __) => const Center(
-            child: SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
-          errorWidget: (_, __, ___) => Icon(
-            Icons.candlestick_chart_rounded,
-            color: AppColors.accent.withValues(alpha: 0.6),
-            size: 24,
-          ),
-          ),
+      child: Center(
+        child: Icon(
+          Icons.candlestick_chart_rounded,
+          color: AppColors.accent.withValues(alpha: 0.6),
+          size: 24,
         ),
       ),
     ),

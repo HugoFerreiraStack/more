@@ -1,5 +1,5 @@
 import 'package:b3/features/home/presenter/bindings/home_binding.dart';
-import 'package:b3/features/home/presenter/pages/home_page.dart';
+import 'package:b3/features/home/presenter/pages/main_tab_page.dart';
 import 'package:b3/features/home/presenter/pages/stock_detail_page.dart';
 import 'package:b3/features/splash/presenter/bindings/splash_binding.dart';
 import 'package:b3/features/splash/presenter/pages/splash_page.dart';
@@ -16,7 +16,7 @@ abstract class AppPages {
     ),
     GetPage(
       name: AppRoutes.home,
-      page: () => const HomePage(),
+      page: () => const MainTabPage(),
       binding: HomeBinding(),
     ),
     GetPage(

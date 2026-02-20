@@ -29,6 +29,9 @@ class HomeController extends GetxController {
   final currentPage = 1.obs;
   final totalPages = 1.obs;
   final hasNextPage = false.obs;
+  final RxInt tabIndex = 0.obs;
+
+  void setTabIndex(int i) => tabIndex.value = i;
 
   static const _loadMoreThreshold = 200.0;
 

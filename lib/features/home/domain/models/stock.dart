@@ -38,4 +38,16 @@ class Stock {
   }
 
   bool get isPositive => change >= 0;
+
+  Map<String, dynamic> toJson() => {
+        'stock': stock,
+        'name': name,
+        'close': close,
+        'change': change,
+        'volume': volume,
+        'market_cap': marketCap,
+        'logo': logo,
+        'sector': sector,
+        'type': type,
+      };
 }

@@ -27,4 +27,19 @@ class AppSemantics {
       descending ? 'maior primeiro' : 'menor primeiro';
   static String sortDirectionAlphabetical(bool descending) =>
       descending ? 'Z a A' : 'A a Z';
+
+  static const walletHeader =
+      'Minha carteira. Ações adicionadas aos favoritos.';
+
+  static const emptyWallet =
+      'Carteira vazia. Toque no ícone de estrela nos cards de ações para adicionar à carteira.';
+
+  static const emptyWalletSearch =
+      'Nenhum ativo encontrado na carteira. Tente outro termo de busca.';
+
+  static String addToWallet(String ticker) =>
+      'Adicionar $ticker à carteira';
+
+  static String removeFromWallet(String ticker) =>
+      'Remover $ticker da carteira';
 }
